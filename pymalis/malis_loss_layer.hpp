@@ -12,8 +12,8 @@ class MalisLossLayer {
 			size_t width, size_t height, size_t depth,
 			const float* affinity_prob,
 			const int64_t* gt_labels,
-			float* dloss_neg,
-			float* dloss_pos);
+			float* dloss_pos,
+			float* dloss_neg);
 
 private:
 

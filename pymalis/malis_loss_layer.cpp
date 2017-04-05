@@ -266,10 +266,11 @@ MalisLossLayer::evaluate(
 		size_t width, size_t height, size_t depth,
 		const float* affinity_prob,
 		const int64_t* gt_labels,
-		float* dloss_neg,
-		float* dloss_pos) {
+		float* dloss_pos,
+		float* dloss_neg) {
 
-	size_t n = width*height*depth;
+	size_t size = width*height*depth;
+	size_t numEdges = 3*size;
 
 	// Set up the neighborhood
 	nhood_data_.clear();
@@ -289,7 +290,7 @@ MalisLossLayer::evaluate(
 	nhood_dims_.push_back(3);
 
 	// gt affinity
-	float* gt_affinity = new float[3*n];
+	float* gt_affinity = new float[numEdges];
 	for (int d = 0; d < 3; d++)
 	for (size_t z = 0; z < depth-1; z++)
 	for (size_t y = 0; y < width-1; y++)
@@ -303,15 +304,15 @@ MalisLossLayer::evaluate(
 		size_t j = zp*width*depth + yp*width + xp;
 
 		if (gt_labels[i] == gt_labels[j])
-			gt_affinity[d*n + z*width*depth + y*width + x] = 1;
+			gt_affinity[d*size + z*width*depth + y*width + x] = 1;
 		else
-			gt_affinity[d*n + z*width*depth + y*width + x] = 0;
+			gt_affinity[d*size + z*width*depth + y*width + x] = 0;
 	}
 
-	float* affinity_data_pos = new float[3*n];
-	float* affinity_data_neg = new float[3*n];
+	float* affinity_data_pos = new float[numEdges];
+	float* affinity_data_neg = new float[numEdges];
 
-	for (size_t i = 0; i < n; ++i) {
+	for (size_t i = 0; i < numEdges; ++i) {
 		affinity_data_pos[i] = std::min(affinity_prob[i], gt_affinity[i]);
 		affinity_data_neg[i] = std::max(affinity_prob[i], gt_affinity[i]);
 		dloss_pos[i] = 0;
