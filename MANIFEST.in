@@ -1,0 +1,6 @@
+include README.md
+recursive-include pymalis *.hpp
+recursive-include pymalis *.cpp
+recursive-include pymalis *.pyx
+recursive-include pymalis *.h
+include pymalis/.cpp
