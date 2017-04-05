@@ -49,9 +49,9 @@ def __malis(
 cdef extern from "c_frontend.h":
 
     void ___malis(
-            size_t         width,
-            size_t         height,
             size_t         depth,
+            size_t         height,
+            size_t         width,
             const float*   affinity_data,
             const int64_t* groundtruth_data,
             float*         loss_pos_data,

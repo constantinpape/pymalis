@@ -9,7 +9,7 @@ class MalisLossLayer {
  public:
 
   void evaluate(
-			size_t width, size_t height, size_t depth,
+			size_t depth, size_t height, size_t width,
 			const float* affinity_prob,
 			const int64_t* gt_labels,
 			float* dloss_pos,

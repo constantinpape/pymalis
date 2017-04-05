@@ -263,7 +263,7 @@ void MalisLossLayer::malis(const float* conn_data,
 
 void
 MalisLossLayer::evaluate(
-		size_t width, size_t height, size_t depth,
+		size_t depth, size_t height, size_t width,
 		const float* affinity_prob,
 		const int64_t* gt_labels,
 		float* dloss_pos,
@@ -291,22 +291,27 @@ MalisLossLayer::evaluate(
 
 	// gt affinity
 	float* gt_affinity = new float[numEdges];
-	for (int d = 0; d < 3; d++)
-	for (size_t z = 0; z < depth-1; z++)
-	for (size_t y = 0; y < width-1; y++)
-	for (size_t x = 0; x < height-1; x++) {
+	for (int d = 0; d < 3; d++) {
 
-		size_t zp = z + nhood_data_[d*3 + 0];
-		size_t yp = y + nhood_data_[d*3 + 1];
-		size_t xp = x + nhood_data_[d*3 + 2];
+		for (int z = 0; z < depth; z++)
+		for (int y = 0; y < width; y++)
+		for (int x = 0; x < height; x++) {
 
-		size_t i = z*width*depth + y*width + x;
-		size_t j = zp*width*depth + yp*width + xp;
+			int zp = z + nhood_data_[d*3 + 0];
+			int yp = y + nhood_data_[d*3 + 1];
+			int xp = x + nhood_data_[d*3 + 2];
 
-		if (gt_labels[i] == gt_labels[j])
-			gt_affinity[d*size + z*width*depth + y*width + x] = 1;
-		else
-			gt_affinity[d*size + z*width*depth + y*width + x] = 0;
+			bool outside_edge = (zp >= depth || yp >= height || xp >= width);
+
+			size_t i = z*width*height + y*width + x;
+			size_t j = zp*width*height + yp*width + xp;
+
+			if (outside_edge || gt_labels[i] != gt_labels[j] || gt_labels[i] == 0 || gt_labels[j] == 0)
+				gt_affinity[d*size + i] = 0;
+			else
+				gt_affinity[d*size + i] = 1;
+
+		}
 	}
 
 	float* affinity_data_pos = new float[numEdges];
@@ -325,20 +330,6 @@ MalisLossLayer::evaluate(
 	float rand_index_out = 0;
 
 	std::vector<int> aff_dims = {3, (int)depth, (int)height, (int)width};
-	malis(
-			affinity_data_neg,
-			4, &aff_dims[0],
-			&nhood_data_[0],
-			&nhood_dims_[0],
-			gt_labels,
-			false, // positive pass?
-			dloss_neg,
-			&loss_out,
-			&classerr_out,
-			&rand_index_out);
-
-	loss += 0.5 * loss_out;
-	// std::cout << "NEG: " << loss_out << std::endl;
 
 	malis(
 			affinity_data_pos,
@@ -354,6 +345,21 @@ MalisLossLayer::evaluate(
 
 	loss += 0.5 * loss_out;
 	// std::cout << "POS: " << loss_out << std::endl;
+
+	malis(
+			affinity_data_neg,
+			4, &aff_dims[0],
+			&nhood_data_[0],
+			&nhood_dims_[0],
+			gt_labels,
+			false, // positive pass?
+			dloss_neg,
+			&loss_out,
+			&classerr_out,
+			&rand_index_out);
+
+	loss += 0.5 * loss_out;
+	// std::cout << "NEG: " << loss_out << std::endl;
 
 	delete[] gt_affinity;
 	delete[] affinity_data_pos;
