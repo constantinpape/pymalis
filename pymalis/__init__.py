@@ -27,6 +27,7 @@ def malis(
             os.path.join(source_dir, 'frontend.pyx'),
             os.path.join(source_dir, 'malis_loss_layer.hpp'),
             os.path.join(source_dir, 'malis_loss_layer.cpp'),
+            os.path.join(source_dir, 'c_frontend.h'),
     ]
     source_files.sort()
     source_files_hashes = [ hashlib.md5(open(f, 'r').read().encode('utf-8')).hexdigest() for f in source_files ]
