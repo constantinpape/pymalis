@@ -16,11 +16,6 @@ void ___malis(
 
 	MalisLossLayer malis;
 
-	std::vector<float>   affs(3*10*10*10);
-	std::vector<int64_t> gt(10*10*10);
-	std::vector<float>   loss_pos(3*10*10*10);
-	std::vector<float>   loss_neg(3*10*10*10);
-
 	malis.evaluate(
 			width, height, depth,
 			affinity_data, groundtruth_data,
