@@ -275,14 +275,14 @@ MalisLossLayer::evaluate(
 	// Set up the neighborhood
 	nhood_data_.clear();
 
-	// Dimension primary edges (+Z, +Y, +X) only:
-	// 1 edge:		+X					(0,0,1)
-	// 2 edges:	 +Y, +X			(0,1,0); (0,0,1)
-	// 3 edges:	 +Z, +Y, +X	(1,0,0); (0,1,0); (0,0,1)
+	// Dimension primary edges (-Z, -Y, -X) only:
+	// 1 edge:		-X					(0,0,-1)
+	// 2 edges:	 -Y, -X			(0,-1,0); (0,0,-1)
+	// 3 edges:	 -Z, -Y, -X	(-1,0,0); (0,-1,0); (0,0,-1)
 	for (int i = 0; i < 3; ++i) {
-		nhood_data_.push_back((i + 3) % 3 == 0 ? 1 : 0);
-		nhood_data_.push_back((i + 2) % 3 == 0 ? 1 : 0);
-		nhood_data_.push_back((i + 1) % 3 == 0 ? 1 : 0);
+		nhood_data_.push_back((i + 3) % 3 == 0 ? -1 : 0);
+		nhood_data_.push_back((i + 2) % 3 == 0 ? -1 : 0);
+		nhood_data_.push_back((i + 1) % 3 == 0 ? -1 : 0);
 	}
 
 	nhood_dims_.clear();
@@ -301,7 +301,7 @@ MalisLossLayer::evaluate(
 			int yp = y + nhood_data_[d*3 + 1];
 			int xp = x + nhood_data_[d*3 + 2];
 
-			bool outside_edge = (zp >= depth || yp >= height || xp >= width);
+			bool outside_edge = (zp < 0 || yp < 0 || xp < 0 || zp >= depth || yp >= height || xp >= width);
 
 			size_t i = z*width*height + y*width + x;
 			size_t j = zp*width*height + yp*width + xp;
