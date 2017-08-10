@@ -39,14 +39,15 @@ def __malis(
     loss_pos_data = &loss_pos[0,0,0,0]
     loss_neg_data = &loss_neg[0,0,0,0]
 
-    ___malis(
-            affs.shape[1], affs.shape[2], affs.shape[3],
-            aff_data,
-            gt_data,
-            loss_pos_data,
-            loss_neg_data)
+    with nogil:
+        ___malis(
+                affs.shape[1], affs.shape[2], affs.shape[3],
+                aff_data,
+                gt_data,
+                loss_pos_data,
+                loss_neg_data)
 
-cdef extern from "c_frontend.h":
+cdef extern from "c_frontend.h" nogil:
 
     void ___malis(
             size_t         depth,
